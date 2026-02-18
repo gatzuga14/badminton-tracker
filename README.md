@@ -1,2 +1,2 @@
-# badminton-tracker
+# badminton-tracker by JBH
 Badminton Activity 
