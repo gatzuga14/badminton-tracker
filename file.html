@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badminton Buddies - Activity Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <i class="fas fa-table-tennis header-icon"></i>
+                <h1>Badminton Buddies</h1>
+                <div class="header-stats">
+                    <span id="memberCount">0 Members</span>
+                    <span id="activityCount">0 Activities</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="members">
+                <i class="fas fa-users"></i> Members
+            </button>
+            <button class="nav-tab" data-tab="activities">
+                <i class="fas fa-calendar-alt"></i> Activities
+            </button>
+            <button class="nav-tab" data-tab="bills">
+                <i class="fas fa-calculator"></i> Bill Splitter
+            </button>
+        </nav>
+
+        <!-- Members Section -->
+        <section id="members" class="tab-content active">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Team Members</h2>
+                <button class="btn btn-primary" onclick="openAddMemberModal()">
+                    <i class="fas fa-plus"></i> Add Member
+                </button>
+            </div>
+            
+            <div class="members-grid" id="membersGrid">
+                <!-- Members will be populated here -->
+            </div>
+        </section>
+
+        <!-- Activities Section -->
+        <section id="activities" class="tab-content">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-alt"></i> Activities</h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openAddActivityModal()">
+                        <i class="fas fa-plus"></i> New Activity
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportActivities()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+            
+            <div class="activities-list" id="activitiesList">
+                <!-- Activities will be populated here -->
+            </div>
+        </section>
+
+        <!-- Bill Splitter Section -->
+        <section id="bills" class="tab-content">
+            <div class="section-header">
+                <h2><i class="fas fa-calculator"></i> Bill Splitter</h2>
+                <button class="btn btn-primary" onclick="openBillModal()">
+                    <i class="fas fa-plus"></i> Split Bill
+                </button>
+            </div>
+            
+            <div class="bills-container" id="billsContainer">
+                <!-- Bills will be populated here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Member</h3>
+                <span class="close" onclick="closeModal('memberModal')">&times;</span>
+            </div>
+            <form id="memberForm" onsubmit="addMember(event)">
+                <div class="form-group">
+                    <label for="memberName">Name:</label>
+                    <input type="text" id="memberName" required>
+                </div>
+                <div class="form-group">
+                    <label for="memberEmail">Email:</label>
+                    <input type="email" id="memberEmail">
+                </div>
+                <div class="form-group">
+                    <label for="memberPhone">Phone:</label>
+                    <input type="tel" id="memberPhone">
+                </div>
+                <div class="form-group">
+                    <label for="memberPhoto">Photo:</label>
+                    <input type="file" id="memberPhoto" accept="image/*" onchange="previewImage(this, 'memberPhotoPreview')">
+                    <div class="photo-preview" id="memberPhotoPreview"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Add Member</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('memberModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Activity Modal -->
+    <div id="activityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Schedule New Activity</h3>
+                <span class="close" onclick="closeModal('activityModal')">&times;</span>
+            </div>
+            <form id="activityForm" onsubmit="addActivity(event)">
+                <div class="form-group">
+                    <label for="activityTitle">Activity Title:</label>
+                    <input type="text" id="activityTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="activityType">Type:</label>
+                    <select id="activityType">
+                        <option value="singles">Singles Match</option>
+                        <option value="doubles">Doubles Match</option>
+                        <option value="training">Training Session</option>
+                        <option value="tournament">Tournament</option>
+                        <option value="social">Social Game</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="activityDate">Date:</label>
+                        <input type="date" id="activityDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="activityTime">Time:</label>
+                        <input type="time" id="activityTime" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="activityLocation">Location:</label>
+                    <input type="text" id="activityLocation" required>
+                </div>
+                <div class="form-group">
+                    <label for="activityParticipants">Participants:</label>
+                    <div id="participantsList" class="participants-list">
+                        <!-- Will be populated with member checkboxes -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="activityNotes">Notes:</label>
+                    <textarea id="activityNotes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Schedule Activity</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('activityModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bill Splitter Modal -->
+    <div id="billModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Split Bill</h3>
+                <span class="close" onclick="closeModal('billModal')">&times;</span>
+            </div>
+            <form id="billForm" onsubmit="calculateBill(event)">
+                <div class="form-group">
+                    <label for="billDescription">Description:</label>
+                    <input type="text" id="billDescription" required>
+                </div>
+                <div class="form-group">
+                    <label for="billAmount">Total Amount ($):</label>
+                    <input type="number" id="billAmount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="billParticipants">Split Between:</label>
+                    <div id="billParticipantsList" class="participants-list">
+                        <!-- Will be populated with member checkboxes -->
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Calculate Split</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('billModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
